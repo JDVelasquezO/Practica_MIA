@@ -8,6 +8,6 @@ router.get('/', (req, res) => {
 // router.get('/clients', controller.list);
 // router.post('/insertClients', controller.save);
 router.get('/cargarModelo', controller.loadModel);
-router.get('/bulkLoad', controller.bulkLoad);
+router.get('/cargarTemporal', controller.bulkLoad);
 
 module.exports = router;

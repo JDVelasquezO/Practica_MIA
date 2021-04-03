@@ -1,4 +1,6 @@
 const conn = require('../config/conn');
+const queryLoadData = require('../../res/DDL');
+const queryBulkLoad = require('../../res/DML');
 const controller = {}
 
 // controller.list = (req, res) => {
@@ -11,8 +13,6 @@ const controller = {}
 // }
 
 controller.loadModel = (req, res) => {
-    const queryLoadData = require('../../res/DDL');
-    // console.log(queryLoadData);
     conn.query(queryLoadData, (err, data) => {
         res.json({
             err,
@@ -22,13 +22,6 @@ controller.loadModel = (req, res) => {
 }
 
 controller.bulkLoad = (req, res) => {
-    const queryBulkLoad = "LOAD DATA\
-    INFILE '/var/lib/mysql-files/text.csv' INTO TABLE temp\
-    FIELDS TERMINATED BY ';'\
-    LINES TERMINATED BY '\n'\
-    IGNORE 1 LINES\
-    (id, name)";
-
     conn.query(queryBulkLoad, (err, data) => {
         res.json({
             err,
