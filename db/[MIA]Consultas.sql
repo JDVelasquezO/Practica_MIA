@@ -73,15 +73,17 @@ INNER JOIN GPS G
 INNER JOIN Treatment T
     ON VT.fk_IdTreatment = T.id_treatment
 WHERE G.address = "1987 Delphine Well"
-AND T.name_treatment = "Manejo Presion Arterial"
+AND T.name_treatment = "Manejo de la Presion Arterial"
 AND Hospital_Victim.death_date IS NOT NULL
 
 # Query 7
 SELECT first_name, last_name, G.address FROM Victim_Associate
 INNER JOIN Victim
     ON Victim_Associate.fk_idVictim = Victim.id_victim
+INNER JOIN Victim_GPS VG
+    ON Victim.id_victim = VG.fk_idVictim
 INNER JOIN GPS G
-    ON Victim.fk_idGPS = G.id_gps
+    ON VG.fk_idGPS = G.id_gps
 INNER JOIN Hospital_Victim HV
     ON HV.fk_IdVictim = Victim.id_victim
 INNER JOIN Victim_Treatment VT

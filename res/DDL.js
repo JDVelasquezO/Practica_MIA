@@ -1,5 +1,4 @@
-const queryData = `
-    # USAR DB
+const queryData = `# USAR DB
     USE GVE;
 
     # CREACION DE TABLAS
@@ -59,7 +58,7 @@ const queryData = `
 
     CREATE TABLE IF NOT EXISTS Treatment (
         id_treatment int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-        name_treatment varchar(25)
+        name_treatment varchar(50)
     );
 
     CREATE TABLE IF NOT EXISTS Victim_Treatment (
@@ -83,7 +82,7 @@ const queryData = `
 
     CREATE TABLE IF NOT EXISTS Type_Contact (
         id_contact int PRIMARY KEY NOT NULL AUTO_INCREMENT,
-        type_contact varchar(25)
+        type_contact varchar(50)
     );
 
     CREATE TABLE IF NOT EXISTS Victim_Associate (
