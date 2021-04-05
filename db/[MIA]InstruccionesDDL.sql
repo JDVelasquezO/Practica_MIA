@@ -40,11 +40,8 @@ CREATE TABLE IF NOT EXISTS GPS (
 
 CREATE TABLE IF NOT EXISTS Hospital (
 	id_hospital int AUTO_INCREMENT PRIMARY KEY NOT NULL,
-	fk_idGPS int,
 	name varchar(50),
-	address varchar(125),
-	CONSTRAINT FK_IDGPS2 FOREIGN KEY (fk_idGPS) 
-	REFERENCES GPS(id_gps)
+	address varchar(125)
 );
 
 CREATE TABLE IF NOT EXISTS Status_Victim (
@@ -60,18 +57,20 @@ CREATE TABLE IF NOT EXISTS Victim (
 	fk_IdStatus int,
 	firstSuspicion_date DATETIME,
 	confirm_date DATETIME,
-	CONSTRAINT FK_IDSTATUS FOREIGN KEY (fk_IdStatus) 
+	FOREIGN KEY (fk_IdStatus) 
 	REFERENCES Status_Victim(id_status)
 );
 
 CREATE TABLE IF NOT EXISTS Victim_GPS (
 	fk_idVictim int,
 	fk_idGPS int,
-	CONSTRAINT FK_IDVICTIM4 FOREIGN KEY (fk_IdVictim) 
+	registration_date DATETIME,
+	retirement_date DATETIME,
+	FOREIGN KEY (fk_IdVictim) 
 	REFERENCES Victim(id_victim),
-	CONSTRAINT FK_IDGPS FOREIGN KEY (fk_idGPS) 
+	FOREIGN KEY (fk_idGPS) 
 	REFERENCES GPS(id_gps),
-	PRIMARY KEY (fk_IdVictim, fk_idGPS)
+	PRIMARY KEY (fk_IdVictim, fk_idGPS, registration_date)
 );
 
 CREATE TABLE IF NOT EXISTS Hospital_Victim (
@@ -80,9 +79,9 @@ CREATE TABLE IF NOT EXISTS Hospital_Victim (
 	registration_date DATETIME,
 	retirement_date DATETIME,
 	death_date DATETIME,
-	CONSTRAINT FK_IDHOSPITAL FOREIGN KEY (fk_IdHospital) 
+	FOREIGN KEY (fk_IdHospital) 
 	REFERENCES Hospital(id_hospital),
-	CONSTRAINT FK_IDVICTIM FOREIGN KEY (fk_IdVictim) 
+	FOREIGN KEY (fk_IdVictim) 
 	REFERENCES Victim(id_victim),
 	PRIMARY KEY(fk_IdHospital, fk_IdVictim)
 );
@@ -98,9 +97,9 @@ CREATE TABLE IF NOT EXISTS Victim_Treatment (
 	effectiveness int,
 	startTreatment_date DATETIME,
 	finishTreatment_date DATETIME,
-	CONSTRAINT FK_IDVICTIM2 FOREIGN KEY (fk_IdVictim)
+	FOREIGN KEY (fk_IdVictim)
 	REFERENCES Victim(id_victim),
-	CONSTRAINT FK_IDTREATMENT FOREIGN KEY (fk_IdTreatment)
+	FOREIGN KEY (fk_IdTreatment)
 	REFERENCES Treatment(id_treatment),
 	PRIMARY KEY (fk_IdVictim, fk_IdTreatment)
 );
@@ -123,11 +122,12 @@ CREATE TABLE IF NOT EXISTS Victim_Associate (
 	meet_date DATETIME,
 	startContact_Date DATETIME,
 	endContact_Date DATETIME,
-	CONSTRAINT FK_IDVICTIM3 FOREIGN KEY (fk_IdVictim)
+	FOREIGN KEY (fk_IdVictim)
 	REFERENCES Victim(id_victim),
-	CONSTRAINT FK_IDASSOCIATE FOREIGN KEY (fk_idAssociate)
+	FOREIGN KEY (fk_idAssociate)
 	REFERENCES Associate_Person(id_associate_person),
-	CONSTRAINT FK_IDCONTACT FOREIGN KEY (fk_idTypeContact)
+	FOREIGN KEY (fk_idTypeContact)
 	REFERENCES Type_Contact(id_contact),
 	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact)	
 );
+
