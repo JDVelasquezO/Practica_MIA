@@ -210,18 +210,18 @@ const queryData = `# RESETEO DE BASE DE DATOS
     WHERE CONTACTO_FISICO != '';
 
     # INSERT VICTIM ASSOCIATE
-    INSERT INTO Victim_Associate (fk_idVictim, fk_idAssociate, fk_idTypeContact,
-        meet_date, startContact_Date, endContact_Date)
-    SELECT DISTINCT id_victim, id_associate_person, id_contact,
-        FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO FROM Temp
-    LEFT JOIN Victim
-    ON Temp.NOMBRE_VICTIMA = Victim.first_name
-    LEFT JOIN Associate_Person
-    ON Temp.NOMBRE_ASOCIADO = Associate_Person.first_name
-    LEFT JOIN Type_Contact
-    ON Temp.CONTACTO_FISICO = type_contact
-    WHERE id_victim IS NOT NULL AND id_contact IS NOT NULL
-    GROUP BY id_associate_person;
+    INSERT INTO Victim_Associate(fk_idVictim, fk_idAssociate, fk_idTypeContact, meet_date, startContact_Date,
+        endContact_Date)
+    SELECT
+    (SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA 
+        AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+    (SELECT id_associate_person FROM Associate_Person WHERE Associate_Person.first_name = Temp.NOMBRE_ASOCIADO 
+        AND Associate_Person.last_name = Temp.APELLIDO_ASOCIADO limit 1) AS id_asociado,
+    (SELECT id_contact FROM Type_Contact WHERE Type_Contact.type_contact = Temp.CONTACTO_FISICO limit 1) AS id_contacto,
+    FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO
+    FROM Temp
+    WHERE Temp.CONTACTO_FISICO != ''
+    GROUP BY id_victima, id_asociado, id_contacto, FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO;
 `;
 
 module.exports = queryData;

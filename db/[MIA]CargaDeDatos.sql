@@ -28,25 +28,29 @@ GROUP BY NOMBRE_VICTIMA, APELLIDO_VICTIMA, DIRECCION_VICTIMA, ESTADO_VICTIMA;
 
 # INSERT VICTIM_GPS
 INSERT INTO Victim_GPS (fk_idVictim, fk_idGPS, registration_date, retirement_date)
-SELECT DISTINCT Victim.id_victim, GPS.id_gps, FECHA_LLEGADA, FECHA_RETIRO
+SELECT
+(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
+    AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+(SELECT id_gps FROM GPS WHERE GPS.address = Temp.UBICACION_VICTIMA limit 1) AS id_gps,
+FECHA_LLEGADA, FECHA_RETIRO
 FROM Temp
-INNER JOIN Victim
-    ON Temp.NOMBRE_VICTIMA = Victim.first_name
-    AND Temp.APELLIDO_VICTIMA = Victim.last_name
-INNER JOIN GPS
-    ON Temp.UBICACION_VICTIMA = GPS.address;
+WHERE FECHA_LLEGADA != '' AND FECHA_RETIRO != ''
+GROUP BY id_victima, id_gps;
 
 # INSERT HOSPITAL_VICTIM
 INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim, registration_date, retirement_date, death_date)
-SELECT Hospital.id_hospital, Victim.id_victim, STR_TO_DATE(Temp.FECHA_LLEGADA, '%Y-%m-%d %H:%i:%s'),
-       STR_TO_DATE(FECHA_RETIRO, '%Y-%m-%d %H:%i:%s'), STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s')
-FROM Hospital
-INNER JOIN Temp
-ON Temp.NOMBRE_HOSPITAL = Hospital.name
-INNER JOIN Victim
-ON Temp.NOMBRE_VICTIMA = Victim.first_name
-    AND Temp.APELLIDO_VICTIMA = Victim.last_name
-GROUP BY Hospital.id_hospital, Victim.first_name, Victim.last_name;
+SELECT
+(SELECT Hospital.id_hospital FROM Hospital WHERE Temp.NOMBRE_HOSPITAL = Hospital.name AND
+    Temp.DIRECCION_HOSPITAL = Hospital.address LIMIT 1) AS id_hospital,
+(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
+    AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+STR_TO_DATE(Temp.FECHA_LLEGADA, '%Y-%m-%d %H:%i:%s') AS Fecha_Llegada,
+STR_TO_DATE(FECHA_RETIRO, '%Y-%m-%d %H:%i:%s') AS Fecha_Retiro,
+STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s') AS Fecha_Muerte
+FROM Temp
+WHERE FECHA_LLEGADA != '' AND FECHA_RETIRO != '' AND FECHA_MUERTE != ''
+AND NOMBRE_HOSPITAL != ''
+GROUP BY id_victima, id_hospital;
 
 # INSERT TREATMENT
 INSERT INTO Treatment (name_treatment)
@@ -56,15 +60,15 @@ WHERE TRATAMIENTO != '';
 # INSERT VICTIM TREATMENT
 INSERT INTO Victim_Treatment (fk_IdVictim, fk_IdTreatment, effectiveness,
                               startTreatment_date, finishTreatment_date)
-SELECT DISTINCT id_victim, id_treatment, EFECTIVIDAD_EN_VICTIMA, FECHA_INICIO_TRATAMIENTO,
-       FECHA_FIN_TRATAMIENTO FROM Victim
-INNER JOIN Temp
-ON Temp.NOMBRE_VICTIMA = Victim.first_name
-    AND Temp.APELLIDO_VICTIMA = Victim.last_name
-INNER JOIN Treatment
-ON Temp.TRATAMIENTO = Treatment.name_treatment
-WHERE FECHA_INICIO_TRATAMIENTO != '' AND FECHA_FIN_TRATAMIENTO != ''
-AND EFECTIVIDAD_EN_VICTIMA != '';
+SELECT DISTINCT
+(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
+AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+(SELECT id_treatment FROM Treatment WHERE Treatment.name_treatment = Temp.TRATAMIENTO) AS id_tratamiento,
+EFECTIVIDAD_EN_VICTIMA, FECHA_INICIO_TRATAMIENTO, FECHA_FIN_TRATAMIENTO
+FROM Temp
+WHERE EFECTIVIDAD_EN_VICTIMA != '' AND FECHA_INICIO_TRATAMIENTO != ''
+AND FECHA_FIN_TRATAMIENTO != ''
+ORDER BY id_victima, id_tratamiento, FECHA_INICIO_TRATAMIENTO;
 
 # INSERT ASSOCIATE
 INSERT INTO Associate_Person (first_name, last_name)
@@ -77,15 +81,15 @@ SELECT DISTINCT CONTACTO_FISICO FROM Temp
 WHERE CONTACTO_FISICO != '';
 
 # INSERT VICTIM ASSOCIATE
-INSERT INTO Victim_Associate (fk_idVictim, fk_idAssociate, fk_idTypeContact,
-                              meet_date, startContact_Date, endContact_Date)
-SELECT DISTINCT id_victim, id_associate_person, id_contact,
-       FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO FROM Temp
-LEFT JOIN Victim
-ON Temp.NOMBRE_VICTIMA = Victim.first_name
-LEFT JOIN Associate_Person
-ON Temp.NOMBRE_ASOCIADO = Associate_Person.first_name
-LEFT JOIN Type_Contact
-ON Temp.CONTACTO_FISICO = type_contact
-WHERE id_victim IS NOT NULL AND id_contact IS NOT NULL
-GROUP BY id_associate_person;
+INSERT INTO Victim_Associate(fk_idVictim, fk_idAssociate, fk_idTypeContact, meet_date, startContact_Date,
+    endContact_Date)
+SELECT
+(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA 
+	AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+(SELECT id_associate_person FROM Associate_Person WHERE Associate_Person.first_name = Temp.NOMBRE_ASOCIADO 
+	AND Associate_Person.last_name = Temp.APELLIDO_ASOCIADO limit 1) AS id_asociado,
+(SELECT id_contact FROM Type_Contact WHERE Type_Contact.type_contact = Temp.CONTACTO_FISICO limit 1) AS id_contacto,
+FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO
+FROM Temp
+WHERE Temp.CONTACTO_FISICO != ''
+GROUP BY id_victima, id_asociado, id_contacto;

@@ -190,3 +190,4 @@ queries.query10 = `
     ) AS Victimas
     GROUP BY (Nombre)
 `
+module.exports = queries

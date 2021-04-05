@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS Victim_Treatment (
 	REFERENCES Victim(id_victim),
 	FOREIGN KEY (fk_IdTreatment)
 	REFERENCES Treatment(id_treatment),
-	PRIMARY KEY (fk_IdVictim, fk_IdTreatment)
+	PRIMARY KEY (fk_IdVictim, fk_IdTreatment, startTreatment_date)
 );
 
 CREATE TABLE IF NOT EXISTS Associate_Person (
@@ -128,6 +128,5 @@ CREATE TABLE IF NOT EXISTS Victim_Associate (
 	REFERENCES Associate_Person(id_associate_person),
 	FOREIGN KEY (fk_idTypeContact)
 	REFERENCES Type_Contact(id_contact),
-	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact)	
+	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact)
 );
-
