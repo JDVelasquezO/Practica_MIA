@@ -3,8 +3,8 @@ SELECT Hospital.name, Hospital.address, COUNT(*) as Fallecidos
 FROM Hospital_Victim
 INNER JOIN Hospital
     ON Hospital_Victim.fk_IdHospital = Hospital.id_hospital
-WHERE death_date IS NOT NULL
-GROUP BY Hospital.name
+WHERE death_date != ''
+GROUP BY Hospital.name;
 
 # Query 2
 SELECT first_name, last_name FROM Victim_Treatment
@@ -16,7 +16,7 @@ INNER JOIN Treatment
     ON Victim_Treatment.fk_IdTreatment = Treatment.id_treatment
 WHERE effectiveness > 5
 AND Treatment.name_treatment = "Transfusiones de sangre"
-AND Status_Victim.name_status = "En cuarentena"
+AND Status_Victim.name_status = "En cuarentena";
 
 # Query 3
 SELECT first_name, last_name, address FROM Victim_Associate
@@ -29,7 +29,7 @@ WHERE (
     FROM Victim_Associate
     WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 3
 AND HV.death_date IS NOT NULL
-GROUP BY Victim.first_name
+GROUP BY Victim.first_name;
 
 # Query 4
 SELECT first_name, last_name, address FROM Victim_Associate
@@ -47,7 +47,7 @@ WHERE (
     WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 2
 AND SV.name_status = "Sospecha"
 AND Type_Contact.type_contact = "Beso"
-GROUP BY Victim.first_name
+GROUP BY Victim.first_name;
 
 # Query 5
 SELECT first_name, last_name, COUNT(fk_IdTreatment) AS Cantidad_Tratamiento FROM Victim_Treatment
@@ -58,7 +58,7 @@ INNER JOIN Treatment T
 WHERE T.name_treatment = "Oxigeno"
 GROUP BY first_name, last_name
 ORDER BY Cantidad_Tratamiento
-LIMIT 5
+LIMIT 5;
 
 # Query 6
 SELECT first_name, last_name, death_date FROM Victim
@@ -74,31 +74,24 @@ INNER JOIN Treatment T
     ON VT.fk_IdTreatment = T.id_treatment
 WHERE G.address = "1987 Delphine Well"
 AND T.name_treatment = "Manejo de la Presion Arterial"
-AND Hospital_Victim.death_date IS NOT NULL
+AND Hospital_Victim.death_date IS NOT NULL;
 
 # Query 7
-SELECT first_name, last_name, G.address FROM Victim_Associate
+SELECT Victim.first_name, Victim.last_name, Victim.address FROM Victim_Associate
 INNER JOIN Victim
     ON Victim_Associate.fk_idVictim = Victim.id_victim
-INNER JOIN Victim_GPS VG
-    ON Victim.id_victim = VG.fk_idVictim
-INNER JOIN GPS G
-    ON VG.fk_idGPS = G.id_gps
 INNER JOIN Hospital_Victim HV
     ON HV.fk_IdVictim = Victim.id_victim
-INNER JOIN Victim_Treatment VT
-    ON Victim.id_victim = VT.fk_IdVictim
 WHERE (
     SELECT COUNT(*)
     FROM Victim_Associate
-    WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) < 2
-AND Victim.id_victim = HV.fk_IdVictim
+    WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) = 1
+AND HV.fk_IdVictim IS NOT NULL
 AND (
     SELECT COUNT(*)
     FROM Victim_Treatment
-    WHERE Victim.id_victim = Victim_Treatment.fk_IdVictim
-    ) = 2
-GROUP BY Victim.first_name
+    WHERE Victim.id_victim = Victim_Treatment.fk_IdVictim ) = 2
+GROUP BY Victim.first_name;
 
 # Query 8
 SELECT * FROM (
@@ -125,7 +118,7 @@ SELECT * FROM (
     GROUP BY V.first_name
     ORDER BY Cantidad_Tratamientos ASC
     LIMIT 5
-    ) b
+    ) b;
 
 # Query 9
 SELECT name, address, COUNT(*) AS Cantidad, CONCAT(
@@ -139,7 +132,7 @@ SELECT name, address, COUNT(*) AS Cantidad, CONCAT(
 FROM Hospital
 INNER JOIN Hospital_Victim
 ON Hospital.id_hospital = Hospital_Victim.fk_IdHospital
-GROUP BY Hospital.name
+GROUP BY Hospital.name;
 
 # Query 10
 SELECT Nombre, Contacto, Cantidad, Porcentaje FROM (
@@ -170,4 +163,4 @@ SELECT Nombre, Contacto, Cantidad, Porcentaje FROM (
     GROUP BY Hospital.id_hospital, type_contact
     ORDER BY Cantidad DESC
 ) AS Victimas
-GROUP BY (Nombre)
+GROUP BY (Nombre);

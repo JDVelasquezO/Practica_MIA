@@ -76,8 +76,6 @@ CREATE TABLE IF NOT EXISTS Victim_GPS (
 CREATE TABLE IF NOT EXISTS Hospital_Victim (
 	fk_IdHospital int,
 	fk_IdVictim int,
-	registration_date DATETIME,
-	retirement_date DATETIME,
 	death_date DATETIME,
 	FOREIGN KEY (fk_IdHospital) 
 	REFERENCES Hospital(id_hospital),
@@ -128,5 +126,5 @@ CREATE TABLE IF NOT EXISTS Victim_Associate (
 	REFERENCES Associate_Person(id_associate_person),
 	FOREIGN KEY (fk_idTypeContact)
 	REFERENCES Type_Contact(id_contact),
-	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact)
+	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact, startContact_Date)
 );

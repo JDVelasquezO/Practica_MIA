@@ -8,7 +8,8 @@ queries.query1 = `
         ON Hospital_Victim.fk_IdHospital = Hospital.id_hospital
     WHERE death_date IS NOT NULL
     GROUP BY Hospital.name
-`
+`;
+
 queries.query2 = `
     # Query 2
     SELECT first_name, last_name FROM Victim_Treatment
@@ -21,7 +22,7 @@ queries.query2 = `
     WHERE effectiveness > 5
     AND Treatment.name_treatment = "Transfusiones de sangre"
     AND Status_Victim.name_status = "En cuarentena"
-`
+`;
 
 queries.query3 = `
     # Query 3
@@ -36,7 +37,7 @@ queries.query3 = `
         WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 3
     AND HV.death_date IS NOT NULL
     GROUP BY Victim.first_name
-`
+`;
 
 queries.query4 = `
     # Query 4
@@ -56,7 +57,7 @@ queries.query4 = `
     AND SV.name_status = "Sospecha"
     AND Type_Contact.type_contact = "Beso"
     GROUP BY Victim.first_name
-`
+`;
 
 queries.query5 = `
     # Query 5
@@ -69,7 +70,7 @@ queries.query5 = `
     GROUP BY first_name, last_name
     ORDER BY Cantidad_Tratamiento
     LIMIT 5
-`
+`;
 
 queries.query6 = `
     # Query 6
@@ -87,7 +88,7 @@ queries.query6 = `
     WHERE G.address = "1987 Delphine Well"
     AND T.name_treatment = "Manejo de la Presion Arterial"
     AND Hospital_Victim.death_date IS NOT NULL
-`
+`;
 
 queries.query7 = `
     # Query 7
@@ -113,7 +114,7 @@ queries.query7 = `
         WHERE Victim.id_victim = Victim_Treatment.fk_IdVictim
         ) = 2
     GROUP BY Victim.first_name
-`
+`;
 
 queries.query8 = `
     # Query 8
@@ -142,7 +143,8 @@ queries.query8 = `
         ORDER BY Cantidad_Tratamientos ASC
         LIMIT 5
         ) b
-`
+`;
+
 queries.query9 = `
     # Query 9
     SELECT name, address, COUNT(*) AS Cantidad, CONCAT(
@@ -157,7 +159,8 @@ queries.query9 = `
     INNER JOIN Hospital_Victim
     ON Hospital.id_hospital = Hospital_Victim.fk_IdHospital
     GROUP BY Hospital.name
-`
+`;
+
 queries.query10 = `
     # Query 10
     SELECT Nombre, Contacto, Cantidad, Porcentaje FROM (
@@ -189,5 +192,6 @@ queries.query10 = `
         ORDER BY Cantidad DESC
     ) AS Victimas
     GROUP BY (Nombre)
-`
-module.exports = queries
+`;
+
+module.exports = queries;

@@ -38,18 +38,15 @@ WHERE FECHA_LLEGADA != '' AND FECHA_RETIRO != ''
 GROUP BY id_victima, id_gps;
 
 # INSERT HOSPITAL_VICTIM
-INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim, registration_date, retirement_date, death_date)
+INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim, death_date)
 SELECT
 (SELECT Hospital.id_hospital FROM Hospital WHERE Temp.NOMBRE_HOSPITAL = Hospital.name AND
     Temp.DIRECCION_HOSPITAL = Hospital.address LIMIT 1) AS id_hospital,
 (SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
     AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
-STR_TO_DATE(Temp.FECHA_LLEGADA, '%Y-%m-%d %H:%i:%s') AS Fecha_Llegada,
-STR_TO_DATE(FECHA_RETIRO, '%Y-%m-%d %H:%i:%s') AS Fecha_Retiro,
 STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s') AS Fecha_Muerte
 FROM Temp
-WHERE FECHA_LLEGADA != '' AND FECHA_RETIRO != '' AND FECHA_MUERTE != ''
-AND NOMBRE_HOSPITAL != ''
+WHERE NOMBRE_HOSPITAL != '' AND NOMBRE_VICTIMA != ''
 GROUP BY id_victima, id_hospital;
 
 # INSERT TREATMENT
@@ -84,12 +81,13 @@ WHERE CONTACTO_FISICO != '';
 INSERT INTO Victim_Associate(fk_idVictim, fk_idAssociate, fk_idTypeContact, meet_date, startContact_Date,
     endContact_Date)
 SELECT
-(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA 
+(SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
 	AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
-(SELECT id_associate_person FROM Associate_Person WHERE Associate_Person.first_name = Temp.NOMBRE_ASOCIADO 
+(SELECT id_associate_person FROM Associate_Person WHERE Associate_Person.first_name = Temp.NOMBRE_ASOCIADO
 	AND Associate_Person.last_name = Temp.APELLIDO_ASOCIADO limit 1) AS id_asociado,
 (SELECT id_contact FROM Type_Contact WHERE Type_Contact.type_contact = Temp.CONTACTO_FISICO limit 1) AS id_contacto,
 FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO
 FROM Temp
 WHERE Temp.CONTACTO_FISICO != ''
-GROUP BY id_victima, id_asociado, id_contacto;
+GROUP BY FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO, id_victima, id_asociado, id_contacto;
+
