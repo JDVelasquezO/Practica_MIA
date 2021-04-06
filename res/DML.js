@@ -1,7 +1,4 @@
 const queryBulkLoad = `# RESETEO DE BASE DE DATOS
-    DROP DATABASE IF EXISTS GVE;
-    CREATE DATABASE GVE;
-
     # USAR DB
     USE GVE;
 
