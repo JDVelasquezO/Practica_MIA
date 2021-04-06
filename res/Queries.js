@@ -6,8 +6,8 @@ queries.query1 = `
     FROM Hospital_Victim
     INNER JOIN Hospital
         ON Hospital_Victim.fk_IdHospital = Hospital.id_hospital
-    WHERE death_date IS NOT NULL
-    GROUP BY Hospital.name
+    WHERE death_date != ''
+    GROUP BY Hospital.name;
 `;
 
 queries.query2 = `
@@ -21,7 +21,7 @@ queries.query2 = `
         ON Victim_Treatment.fk_IdTreatment = Treatment.id_treatment
     WHERE effectiveness > 5
     AND Treatment.name_treatment = "Transfusiones de sangre"
-    AND Status_Victim.name_status = "En cuarentena"
+    AND Status_Victim.name_status = "En cuarentena";
 `;
 
 queries.query3 = `
@@ -36,7 +36,7 @@ queries.query3 = `
         FROM Victim_Associate
         WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 3
     AND HV.death_date IS NOT NULL
-    GROUP BY Victim.first_name
+    GROUP BY Victim.first_name;
 `;
 
 queries.query4 = `
@@ -56,7 +56,7 @@ queries.query4 = `
         WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 2
     AND SV.name_status = "Sospecha"
     AND Type_Contact.type_contact = "Beso"
-    GROUP BY Victim.first_name
+    GROUP BY Victim.first_name;
 `;
 
 queries.query5 = `
@@ -69,7 +69,7 @@ queries.query5 = `
     WHERE T.name_treatment = "Oxigeno"
     GROUP BY first_name, last_name
     ORDER BY Cantidad_Tratamiento
-    LIMIT 5
+    LIMIT 5;
 `;
 
 queries.query6 = `
@@ -87,33 +87,26 @@ queries.query6 = `
         ON VT.fk_IdTreatment = T.id_treatment
     WHERE G.address = "1987 Delphine Well"
     AND T.name_treatment = "Manejo de la Presion Arterial"
-    AND Hospital_Victim.death_date IS NOT NULL
+    AND Hospital_Victim.death_date IS NOT NULL;
 `;
 
 queries.query7 = `
     # Query 7
-    SELECT first_name, last_name, G.address FROM Victim_Associate
+    SELECT Victim.first_name, Victim.last_name, Victim.address FROM Victim_Associate
     INNER JOIN Victim
         ON Victim_Associate.fk_idVictim = Victim.id_victim
-    INNER JOIN Victim_GPS VG
-        ON Victim.id_victim = VG.fk_idVictim
-    INNER JOIN GPS G
-        ON VG.fk_idGPS = G.id_gps
     INNER JOIN Hospital_Victim HV
         ON HV.fk_IdVictim = Victim.id_victim
-    INNER JOIN Victim_Treatment VT
-        ON Victim.id_victim = VT.fk_IdVictim
     WHERE (
         SELECT COUNT(*)
         FROM Victim_Associate
-        WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) < 2
-    AND Victim.id_victim = HV.fk_IdVictim
+        WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) = 1
+    AND HV.fk_IdVictim IS NOT NULL
     AND (
         SELECT COUNT(*)
         FROM Victim_Treatment
-        WHERE Victim.id_victim = Victim_Treatment.fk_IdVictim
-        ) = 2
-    GROUP BY Victim.first_name
+        WHERE Victim.id_victim = Victim_Treatment.fk_IdVictim ) = 2
+    GROUP BY Victim.first_name;
 `;
 
 queries.query8 = `
@@ -142,7 +135,7 @@ queries.query8 = `
         GROUP BY V.first_name
         ORDER BY Cantidad_Tratamientos ASC
         LIMIT 5
-        ) b
+        ) b;
 `;
 
 queries.query9 = `
@@ -158,7 +151,7 @@ queries.query9 = `
     FROM Hospital
     INNER JOIN Hospital_Victim
     ON Hospital.id_hospital = Hospital_Victim.fk_IdHospital
-    GROUP BY Hospital.name
+    GROUP BY Hospital.name;
 `;
 
 queries.query10 = `
@@ -191,7 +184,17 @@ queries.query10 = `
         GROUP BY Hospital.id_hospital, type_contact
         ORDER BY Cantidad DESC
     ) AS Victimas
-    GROUP BY (Nombre)
+    GROUP BY (Nombre);
 `;
+
+queries.dropModel = `
+    # Query Drop Model
+    DROP TABLE Victim_Associate, Associate_Person, Type_Contact, Victim_Treatment, Treatment,
+        Hospital_Victim, Victim_GPS, Victim, Status_Victim, Hospital, GPS;
+`
+
+queries.dropTemp = `# Query Drop Temp 
+    TRUNCATE TABLE Temp;
+`
 
 module.exports = queries;

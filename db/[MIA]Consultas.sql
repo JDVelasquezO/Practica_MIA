@@ -164,3 +164,10 @@ SELECT Nombre, Contacto, Cantidad, Porcentaje FROM (
     ORDER BY Cantidad DESC
 ) AS Victimas
 GROUP BY (Nombre);
+
+# Query Drop Model
+DROP TABLE Victim_Associate, Associate_Person, Type_Contact, Victim_Treatment, Treatment,
+    Hospital_Victim, Victim_GPS, Victim, Status_Victim, Hospital, GPS;
+
+# Query Drop Temp
+TRUNCATE TABLE Temp;

@@ -112,4 +112,22 @@ controller.query10 = (req, res) => {
     })
 }
 
+controller.dropModel = (req, res) => {
+    conn.query(queries.dropModel, (err, data) => {
+        res.json({
+            err,
+            result: data
+        })
+    })
+}
+
+controller.dropTemp = (req, res) => {
+    conn.query(queries.dropTemp, (err, data) => {
+        res.json({
+            err,
+            result: data
+        })
+    })
+}
+
 module.exports = controller;
