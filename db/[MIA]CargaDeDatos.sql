@@ -31,9 +31,10 @@ SELECT DISTINCT ESTADO_VICTIMA FROM Temp
 WHERE ESTADO_VICTIMA != '';
 
 # INSERT VICTIM
-INSERT INTO Victim (first_name, last_name, address, fk_IdStatus, firstSuspicion_date, confirm_date)
+INSERT INTO Victim (first_name, last_name, address, fk_IdStatus, firstSuspicion_date, confirm_date, death_date)
 SELECT DISTINCT NOMBRE_VICTIMA, APELLIDO_VICTIMA, DIRECCION_VICTIMA, Status_Victim.id_status,
-                FECHA_PRIMERA_SOSPECHA, FECHA_CONFIRMACION
+                FECHA_PRIMERA_SOSPECHA, FECHA_CONFIRMACION, 
+                STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s')
 FROM Temp
 INNER JOIN Status_Victim
 ON Temp.ESTADO_VICTIMA = Status_Victim.name_status
@@ -53,13 +54,12 @@ WHERE FECHA_LLEGADA != '' AND FECHA_RETIRO != ''
 GROUP BY id_victima, id_gps;
 
 # INSERT HOSPITAL_VICTIM
-INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim, death_date)
+INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim)
 SELECT
 (SELECT Hospital.id_hospital FROM Hospital WHERE Temp.NOMBRE_HOSPITAL = Hospital.name AND
     Temp.DIRECCION_HOSPITAL = Hospital.address LIMIT 1) AS id_hospital,
 (SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
-    AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
-STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s') AS Fecha_Muerte
+    AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima
 FROM Temp
 WHERE NOMBRE_HOSPITAL != '' AND NOMBRE_VICTIMA != ''
 GROUP BY id_victima, id_hospital;
@@ -97,12 +97,13 @@ INSERT INTO Victim_Associate(fk_idVictim, fk_idAssociate, fk_idTypeContact, meet
     endContact_Date)
 SELECT
 (SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
-	AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
+	AND Victim.last_name = Temp.APELLIDO_VICTIMA limit 1) AS id_victima,
 (SELECT id_associate_person FROM Associate_Person WHERE Associate_Person.first_name = Temp.NOMBRE_ASOCIADO
 	AND Associate_Person.last_name = Temp.APELLIDO_ASOCIADO limit 1) AS id_asociado,
 (SELECT id_contact FROM Type_Contact WHERE Type_Contact.type_contact = Temp.CONTACTO_FISICO limit 1) AS id_contacto,
-FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO
+STR_TO_DATE(FECHA_CONOCIO, '%Y-%m-%d %H:%i:%s') AS Fecha_Conocio,
+STR_TO_DATE(FECHA_INICIO_CONTACTO, '%Y-%m-%d %H:%i:%s') AS Fecha_Inicio_Contacto,
+STR_TO_DATE(FECHA_FIN_CONTACTO, '%Y-%m-%d %H:%i:%s') AS Fecha_Fin_Contacto
 FROM Temp
-WHERE Temp.CONTACTO_FISICO != ''
-GROUP BY FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO, id_victima, id_asociado, id_contacto;
-
+WHERE Temp.NOMBRE_VICTIMA != '' AND Temp.NOMBRE_ASOCIADO != ''
+GROUP BY id_victima, id_asociado, id_contacto, FECHA_CONOCIO, FECHA_INICIO_CONTACTO, FECHA_FIN_CONTACTO;

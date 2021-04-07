@@ -24,6 +24,7 @@ const queryData = `# RESETEO DE BASE DE DATOS
         first_name varchar(50),
         last_name varchar(50),
         address varchar(50),
+        death_date DATETIME,
         fk_IdStatus int,
         firstSuspicion_date DATETIME,
         confirm_date DATETIME,
@@ -46,7 +47,6 @@ const queryData = `# RESETEO DE BASE DE DATOS
     CREATE TABLE IF NOT EXISTS Hospital_Victim (
         fk_IdHospital int,
         fk_IdVictim int,
-        death_date DATETIME,
         FOREIGN KEY (fk_IdHospital) 
         REFERENCES Hospital(id_hospital),
         FOREIGN KEY (fk_IdVictim) 
@@ -117,14 +117,15 @@ const queryData = `# RESETEO DE BASE DE DATOS
     WHERE ESTADO_VICTIMA != '';
 
     # INSERT VICTIM
-    INSERT INTO Victim (first_name, last_name, address, fk_IdStatus, firstSuspicion_date, confirm_date)
+    INSERT INTO Victim (first_name, last_name, address, fk_IdStatus, firstSuspicion_date, confirm_date, death_date)
     SELECT DISTINCT NOMBRE_VICTIMA, APELLIDO_VICTIMA, DIRECCION_VICTIMA, Status_Victim.id_status,
-                    FECHA_PRIMERA_SOSPECHA, FECHA_CONFIRMACION
+        FECHA_PRIMERA_SOSPECHA, FECHA_CONFIRMACION, 
+        STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s')
     FROM Temp
     INNER JOIN Status_Victim
     ON Temp.ESTADO_VICTIMA = Status_Victim.name_status
     WHERE NOMBRE_VICTIMA != '' AND APELLIDO_VICTIMA != '' AND DIRECCION_VICTIMA != ''
-    AND FECHA_PRIMERA_SOSPECHA != '' AND FECHA_CONFIRMACION != ''
+        AND FECHA_PRIMERA_SOSPECHA != '' AND FECHA_CONFIRMACION != ''
     GROUP BY NOMBRE_VICTIMA, APELLIDO_VICTIMA, DIRECCION_VICTIMA, ESTADO_VICTIMA;
 
     # INSERT VICTIM_GPS
@@ -139,13 +140,12 @@ const queryData = `# RESETEO DE BASE DE DATOS
     GROUP BY id_victima, id_gps;
 
     # INSERT HOSPITAL_VICTIM
-    INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim, death_date)
+    INSERT INTO Hospital_Victim (fk_IdHospital, fk_IdVictim)
     SELECT
     (SELECT Hospital.id_hospital FROM Hospital WHERE Temp.NOMBRE_HOSPITAL = Hospital.name AND
         Temp.DIRECCION_HOSPITAL = Hospital.address LIMIT 1) AS id_hospital,
     (SELECT id_victim FROM Victim WHERE Victim.first_name = Temp.NOMBRE_VICTIMA
-        AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima,
-    STR_TO_DATE(FECHA_MUERTE, '%Y-%m-%d %H:%i:%s') AS Fecha_Muerte
+        AND Victim.last_name = Temp.APELLIDO_VICTIMA AND Victim.address = Temp.DIRECCION_VICTIMA limit 1) AS id_victima
     FROM Temp
     WHERE NOMBRE_HOSPITAL != '' AND NOMBRE_VICTIMA != ''
     GROUP BY id_victima, id_hospital;

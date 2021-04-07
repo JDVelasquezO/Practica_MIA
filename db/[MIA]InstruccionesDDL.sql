@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS Victim (
 	first_name varchar(50),
 	last_name varchar(50),
 	address varchar(50),
+	death_date DATETIME,
 	fk_IdStatus int,
 	firstSuspicion_date DATETIME,
 	confirm_date DATETIME,
@@ -72,7 +73,6 @@ CREATE TABLE IF NOT EXISTS Victim_GPS (
 CREATE TABLE IF NOT EXISTS Hospital_Victim (
 	fk_IdHospital int,
 	fk_IdVictim int,
-	death_date DATETIME,
 	FOREIGN KEY (fk_IdHospital) 
 	REFERENCES Hospital(id_hospital),
 	FOREIGN KEY (fk_IdVictim) 
@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS Type_Contact (
 );
 
 CREATE TABLE IF NOT EXISTS Victim_Associate (
+	id_victim_associate int,
 	fk_idVictim int,
 	fk_idAssociate int,
 	fk_idTypeContact int,
@@ -121,6 +122,5 @@ CREATE TABLE IF NOT EXISTS Victim_Associate (
 	FOREIGN KEY (fk_idAssociate)
 	REFERENCES Associate_Person(id_associate_person),
 	FOREIGN KEY (fk_idTypeContact)
-	REFERENCES Type_Contact(id_contact),
-	PRIMARY KEY (fk_IdVictim, fk_idAssociate, fk_idTypeContact, startContact_Date)
+	REFERENCES Type_Contact(id_contact)
 );

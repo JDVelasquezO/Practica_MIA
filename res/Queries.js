@@ -6,6 +6,7 @@ queries.query1 = `
     FROM Hospital_Victim
     INNER JOIN Hospital
         ON Hospital_Victim.fk_IdHospital = Hospital.id_hospital
+    INNER JOIN Victim V on Hospital_Victim.fk_IdVictim = V.id_victim
     WHERE death_date != ''
     GROUP BY Hospital.name;
 `;
@@ -26,37 +27,29 @@ queries.query2 = `
 
 queries.query3 = `
     # Query 3
-    SELECT first_name, last_name, address FROM Victim_Associate
-    INNER JOIN Victim
-        ON Victim_Associate.fk_idVictim = Victim.id_victim
-    INNER JOIN Hospital_Victim HV
-        ON HV.fk_IdVictim = Victim.id_victim
-    WHERE (
-        SELECT COUNT(*)
-        FROM Victim_Associate
-        WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 3
-    AND HV.death_date IS NOT NULL
-    GROUP BY Victim.first_name;
+    SELECT first_name, last_name, address, Cantidad_Contacto,death_date FROM
+    (SELECT first_name, last_name, address, death_date, COUNT(*) Cantidad_Contacto FROM
+        (SELECT first_name, last_name, address, death_date, COUNT(*) Cantidad_Contactos FROM Victim_Associate
+            INNER JOIN Victim V on Victim_Associate.fk_idVictim = V.id_victim
+            WHERE Victim_Associate.fk_idVictim = V.id_victim
+            GROUP BY fk_idVictim, fk_idAssociate) AS Cantidad
+        GROUP BY first_name, last_name) AS Cantidad2
+    WHERE Cantidad_Contacto >= 3
+    AND death_date != '';
 `;
 
 queries.query4 = `
     # Query 4
-    SELECT first_name, last_name, address FROM Victim_Associate
-    INNER JOIN Victim
-        ON Victim_Associate.fk_idVictim = Victim.id_victim
-    INNER JOIN Status_Victim SV
-        ON Victim.fk_IdStatus = SV.id_status
-    INNER JOIN Type_Contact
-        ON Victim_Associate.fk_idTypeContact = Type_Contact.id_contact
-    INNER JOIN Hospital_Victim HV
-        ON HV.fk_IdVictim = Victim.id_victim
-    WHERE (
-        SELECT COUNT(*)
-        FROM Victim_Associate
-        WHERE Victim_Associate.fk_idVictim = Victim.id_victim ) > 2
-    AND SV.name_status = "Sospecha"
-    AND Type_Contact.type_contact = "Beso"
-    GROUP BY Victim.first_name;
+    SELECT first_name, last_name, address
+    FROM Victim
+    INNER JOIN Victim_Associate VA on Victim.id_victim = VA.fk_idVictim
+    WHERE Victim.fk_IdStatus = 5
+    AND VA.fk_idVictim = Victim.id_victim
+    AND (
+        SELECT COUNT(*) FROM Victim_Associate
+        WHERE Victim_Associate.fk_idVictim = Victim.id_victim
+        AND Victim_Associate.fk_idTypeContact = 6 ) > 2
+    GROUP BY Victim.first_name, Victim.last_name;
 `;
 
 queries.query5 = `
@@ -87,7 +80,7 @@ queries.query6 = `
         ON VT.fk_IdTreatment = T.id_treatment
     WHERE G.address = "1987 Delphine Well"
     AND T.name_treatment = "Manejo de la Presion Arterial"
-    AND Hospital_Victim.death_date IS NOT NULL;
+    AND death_date IS NOT NULL;
 `;
 
 queries.query7 = `
